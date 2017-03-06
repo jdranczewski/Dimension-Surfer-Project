@@ -1,5 +1,6 @@
 # Import the pygame library.
 import pygame
+import math
 
 
 class ThreeDMesh():
@@ -100,7 +101,7 @@ def main():
 
         # Do the drawing:
         screen.fill((255, 255, 255))
-        mesh.draw()
+        mesh.draw(screen)
 
         # Update the screen:
         pygame.display.flip()
