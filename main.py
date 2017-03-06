@@ -4,11 +4,12 @@ import math
 
 
 class ThreeDMesh():
-    def __init__(self, id, baseColour):
+    def __init__(self, id, baseColour, maxColour):
         self.id = id
         self.data = self.importData()
         self.z = 0
         self.baseColour = baseColour
+        self.maxColour = maxColour
         self.currentColour = baseColour
 
     # This method will import polygon data from a text file.
@@ -67,11 +68,26 @@ class ThreeDMesh():
             pygame.draw.polygon(screen, self.currentColour, polygon)
 
     # This method will update the self.y attribute based on
-    # the mouse y coordinate
+    # the mouse y coordinate.
     def update(self, mouse_y):
-        self.z = mouse_y
+        # Calculate the difference between the mouse position
+        # and the current z position.
+        diff = mouse_y - self.z
+        # If the difference is bigger than 50,
+        # limit the transition speed.
+        if abs(diff) > 50:
+            # abs(diff)/diff is used to copy the sign of diff.
+            diff = 50 * abs(diff) / diff
+        # Add a fraction of the difference to self.z.
+        self.z += diff * 0.1
+        # Set the currentColour based on self.z.
+        self.currentColour = (calculateColour(self.baseColour[0], self.maxColour[0], self.z), calculateColour(self.baseColour[1], self.maxColour[1], self.z), calculateColour(self.baseColour[2], self.maxColour[2], self.z))
 
     # Other methods will go here...
+
+# Calculate the colour component based on the z position.
+def calculateColour(min, max, z):
+    return min + z/500 * (max-min)
 
 def main():
     # Initialize the pygame environment.
@@ -91,7 +107,7 @@ def main():
     clock = pygame.time.Clock()
 
     # A simple ThreeDMesh for testing purposes.
-    mesh = ThreeDMesh("1", (255,0,0))
+    mesh = ThreeDMesh("1", (150,0,0), (255,0,0))
 
     # Main program loop, runs until the close button is pressed.
     while not done:
@@ -101,11 +117,13 @@ def main():
             # So we set done to True.
             if event.type == pygame.QUIT:
                 done = True
+        # Get the mouse coordinates.
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
         mouse_y = pos[1]
 
         # Game logic:
+        # Update the mesh.
         mesh.update(mouse_y)
 
         # Do the drawing:
