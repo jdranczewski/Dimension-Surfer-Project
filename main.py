@@ -54,6 +54,17 @@ class ThreeDMesh():
         # ...and return the processed data array.
         return data
 
+    # This method will draw a cross-section specified by self.z
+    def draw(self, screen):
+        # This is a set of polygons in the cross-section that
+        # we will be drawing:
+        drawing = self.data[math.floor(self.z)]
+        # We iterate on the elements of the drawing list,
+        # which are lists of vertices...
+        for polygon in drawing:
+            # ...and pass them to the drawing function.
+            pygame.draw.polygon(screen, self.currentColour, polygon)
+
     # Other methods will go here...
 
 def main():
@@ -73,6 +84,9 @@ def main():
     # An object used to manage how fast the screen updates.
     clock = pygame.time.Clock()
 
+    # A simple ThreeDMesh for testing purposes.
+    mesh = ThreeDMesh("1", (255,0,0))
+
     # Main program loop, runs until the close button is pressed.
     while not done:
         # Event processing - we iterate on the events given to us by pygame:
@@ -86,6 +100,7 @@ def main():
 
         # Do the drawing:
         screen.fill((255, 255, 255))
+        mesh.draw()
 
         # Update the screen:
         pygame.display.flip()
