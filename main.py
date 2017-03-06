@@ -66,6 +66,11 @@ class ThreeDMesh():
             # ...and pass them to the drawing function.
             pygame.draw.polygon(screen, self.currentColour, polygon)
 
+    # This method will update the self.y attribute based on
+    # the mouse y coordinate
+    def update(self, mouse_y):
+        self.z = mouse_y
+
     # Other methods will go here...
 
 def main():
@@ -96,8 +101,12 @@ def main():
             # So we set done to True.
             if event.type == pygame.QUIT:
                 done = True
+        pos = pygame.mouse.get_pos()
+        mouse_x = pos[0]
+        mouse_y = pos[1]
 
         # Game logic:
+        mesh.update(mouse_y)
 
         # Do the drawing:
         screen.fill((255, 255, 255))
