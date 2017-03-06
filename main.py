@@ -1,6 +1,61 @@
 # Import the pygame library.
 import pygame
 
+
+class ThreeDMesh():
+    def __init__(self, id, baseColour):
+        self.id = id
+        self.data = self.importData()
+        self.z = 0
+        self.baseColour = baseColour
+        self.currentColour = baseColour
+
+    # This method will import polygon data from a text file.
+    def importData(self):
+        # Create an empty list for the data.
+        data = [[[]]]
+        # Create indexes that will help iterate over polygons and the third dimension.
+        polygonIndex = 0
+        zIndex = 0
+        # Open file specified by the id.
+        with open('level_data/' + self.id + ".txt", 'r') as f:
+            # Parse every line in the file.
+            for line in f:
+                if line == "#\n":
+                    # If line contains a '#' it means that the data about a particular
+                    # cross section has just finished. Create a new sublist
+                    # for the next cross section.
+                    data[zIndex].pop()
+                    data.append([[]])
+                    # We move to the next cross section, so we increase the zIndex.
+                    zIndex += 1
+                    # We have not added any polygons to this cross section yet,
+                    # so we reset the polygonIndex to 0.
+                    polygonIndex = 0
+                elif line == "\n":
+                    # If the line is emty, that means that we reached the end of
+                    # a single polygon's description. We create a sublist to hold
+                    # the next polygon...
+                    data[zIndex].append([])
+                    # ...and change the polygonIndex to indicate that we moved to
+                    # the next polygon.
+                    polygonIndex += 1
+                else:
+                    # If the line is neither empty nor it has a '#' in it,
+                    # we assume that it contains coordinates of a point.
+                    # We add this point to a polygon indicated by polygonIndex
+                    # in the crossSection indicated by the zIndex.
+                    data[zIndex][polygonIndex].append([float(x) for x in line.split(" ")])
+            # The pop() functions throughout the code are to get rid of unpopulated
+            # lists that occur naturally due to the construction of the data format.
+            data.pop()
+        # Close the file...
+        f.closed
+        # ...and return the processed data array.
+        return data
+
+    # Other methods will go here...
+
 def main():
     # Initialize the pygame environment.
     pygame.init()
@@ -26,6 +81,7 @@ def main():
             # So we set done to True.
             if event.type == pygame.QUIT:
                 done = True
+
         # Game logic:
 
         # Do the drawing:
