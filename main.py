@@ -170,6 +170,19 @@ def calculateProjectionVectors(obstacle, player, normal):
         # Return the necessary data.
         return [abs(value1), vector1, abs(value2), vector2]
 
+# Calculate the normal vector for a given edge.
+def getNormal(a, b):
+    # Obtain the vector representing the edge...
+    edge = [b[0] - a[0], b[1] - a[1]]
+    # ...and its length.
+    length = math.sqrt(edge[0]^2 + edge[1]^2)
+    # Turn the edge vector into a unit vector.
+    edge = [edge[0] / length, edge[1] / length]
+    # Create a vector perpendicular to the unit edge vector...
+    normal = [-edge[1], edge[0]]
+    # ...and return it.
+    return normal
+
 def main():
     # Initialize the pygame environment.
     pygame.init()
