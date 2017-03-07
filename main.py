@@ -113,6 +113,28 @@ class Player():
 def calculateColour(min, max, z):
     return min + z/500 * (max-min)
 
+# Project a given polygon onto an axis.
+def project(polygon, normal):
+    # Create a list of projected vertices.
+    projected = []
+    # We treat each vertex coordinates as a position vector
+    # and iterate on them.
+    for vect in polygon:
+        # Calculate the dot product of the position vector and the axis vector.
+        dp = vect[0] * normal[0] + vect[1] * normal[1]
+        # Calculate the projection of the position vector on the axis.
+        projected_v = [normal[0] * dp, normal[1] * dp]
+        # Calculate the projection's length - this is what we actually need.
+        projected_l = math.sqrt(projected_v[0] ** 2 + projected_v[1] ** 2)
+        # Get the direction of the projection relative to the axis direction.
+        sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
+        # Apply the direction to the projected length.
+        projected_l = projected_l * (projected_l / abs(projected_l))
+        # Append the calculated projection to the list of projected vertices.
+        projected.append(projected_l)
+    # After all vertices are processed, return the boundaries of the projection.
+    return [min(projected), max(projected)]
+
 def main():
     # Initialize the pygame environment.
     pygame.init()
