@@ -129,7 +129,7 @@ def project(polygon, normal):
         # Get the direction of the projection relative to the axis direction.
         sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
         # Apply the direction to the projected length.
-        projected_l = projected_l * (projected_l / abs(projected_l))
+        projected_l = projected_l * (sign_p / abs(sign_p))
         # Append the calculated projection to the list of projected vertices.
         projected.append(projected_l)
     # After all vertices are processed, return the boundaries of the projection.
