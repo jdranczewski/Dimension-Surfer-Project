@@ -7,7 +7,7 @@ class ThreeDMesh():
     def __init__(self, id, baseColour, maxColour):
         self.id = id
         self.data = self.importData()
-        self.z = 0
+        self.z = 250
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = baseColour
@@ -85,6 +85,30 @@ class ThreeDMesh():
 
     # Other methods will go here...
 
+# The simplified Player class for testing purposes.
+class Player():
+    def __init__(self, x, y, width, height):
+        # Set the attributes to the values given.
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        # Create the vertices list
+        self.vertices = []
+
+    # Update the position every refresh based on mouse position.
+    def update(self, mouse_x, mouse_y):
+        # Set the coordinates to the mouse coordinates.
+        self.x = mouse_x
+        self.y = mouse_y
+        # Calculate the coordinates of the rectangle's vertices.
+        self.vertices = [[self.x, self.y], [self.x + self.width, self.y], [self.x + self.width, self.y + self.height], [self.x, self.y + self.height]]
+
+    # Draw the Player.
+    def draw(self, screen):
+        # Use pygame's built in draw rectangle function.
+        pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return min + z/500 * (max-min)
@@ -107,7 +131,8 @@ def main():
     clock = pygame.time.Clock()
 
     # A simple ThreeDMesh for testing purposes.
-    mesh = ThreeDMesh("1", (150,0,0), (255,0,0))
+    mesh = ThreeDMesh("1", (0,0,255), (0,255,0))
+    player = Player(0,0,20,20)
 
     # Main program loop, runs until the close button is pressed.
     while not done:
@@ -124,11 +149,13 @@ def main():
 
         # Game logic:
         # Update the mesh.
-        mesh.update(mouse_y)
+        # mesh.update(mouse_y)
+        player.update(mouse_x,mouse_y)
 
         # Do the drawing:
         screen.fill((255, 255, 255))
         mesh.draw(screen)
+        player.draw(screen)
 
         # Update the screen:
         pygame.display.flip()
