@@ -142,7 +142,8 @@ def checkOverlap(obstacle, player, normal):
     player_p = project(player, normal)
     # Test for overlap.
     if (obstacle_p[1] < player_p[0]) or (obstacle_p[0] > player_p[1]):
-        # If the above condition is true, it means that the projections do not overlap.
+        # If the above condition is true,
+        # it means that the projections do not overlap.
         return False
     else:
         # Else, it means that there is overlap.
