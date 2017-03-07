@@ -135,6 +135,19 @@ def project(polygon, normal):
     # After all vertices are processed, return the boundaries of the projection.
     return [min(projected), max(projected)]
 
+# Check whether there is overlap.
+def checkOverlap(obstacle, player, normal):
+    # Project the player and the obstacle onto the axis given by the normal vector.
+    obstacle_p = project(obstacle, normal)
+    player_p = project(player, normal)
+    # Test for overlap.
+    if (obstacle_p[1] < player_p[0]) or (obstacle_p[0] > player_p[1]):
+        # If the above condition is true, it means that the projections do not overlap.
+        return False
+    else:
+        # Else, it means that there is overlap.
+        return True
+
 def main():
     # Initialize the pygame environment.
     pygame.init()
