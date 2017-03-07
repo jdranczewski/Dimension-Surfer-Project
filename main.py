@@ -149,6 +149,27 @@ def checkOverlap(obstacle, player, normal):
         # Else, it means that there is overlap.
         return True
 
+# Check for overlap and calculate projection vectors.
+def calculateProjectionVectors(obstacle, player, normal):
+    # Project the player and the obstacle onto the axis given by the normal vector.
+    obstacle_p = project(obstacle, normal)
+    player_p = project(player, normal)
+    # Test for overlap.
+    if (obstacle_p[1] < player_p[0]) or (obstacle_p[0] > player_p[1]) or obstacle_p[1]-obstacle_p[0] < 1:
+        # If the above condition is true,
+        # it means that the projections do not overlap.
+        return False
+    else:
+        # Else, it means that there is overlap.
+        # Calculate the values of the projection vectors.
+        value1 = obstacle_p[0] - player_p[1]
+        value2 = obstacle_p[1] - player_p[0]
+        # Make them directed along the normal.
+        vector1 = [normal[0] * value1, normal[1] * value1]
+        vector2 = [normal[0] * value2, normal[1] * value2]
+        # Return the necessary data.
+        return [abs(value1), vector1, abs(value2), vector2]
+
 def main():
     # Initialize the pygame environment.
     pygame.init()
