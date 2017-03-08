@@ -115,6 +115,8 @@ class Player():
 class Lava(ThreeDMesh):
     # A method for detecting collisions.
     def collide(self, player):
+        # Set colour to blue for debugging purposes
+        self.currentColour = (0, 255, 0)
         # Take the current cross-section from the data array.
         cSection = self.data[math.floor(self.z)]
         # Iterate over the polygons in the current cross-section.
@@ -127,16 +129,22 @@ class Lava(ThreeDMesh):
             if not sat.checkOverlap(obstacle, player.vertices, [0,1]):
                 continue
             # Iterate over the polygon's edges.
+            # We assume that there is overlap unless proven otherwise.
+            collided = 1
             for i in range(len(obstacle)):
                 # Get the normal to this edge...
                 normal = sat.getNormal(obstacle[i], obstacle[(i+1) % len(obstacle)])
-                # ...and check for overlap.
-                if not sat.checkOverlap(obstacle, player.vertices, normal):
-                    continue
+                # ...and check for overlap, if the axis is not the x or y axis.
+                if (normal[0]*normal[1] != 0) and not sat.checkOverlap(obstacle, player.vertices, normal):
+                    # Stop checking the edges and rise the flag that
+                    # there is no overlap.
+                    collided = 0
+                    break
             # If we got past all the overlap checks and there was overlap
             # on all the axes, it means that there is a collision, so we
             # turn the polygon red (for testing).
-            self.currentColour = (255,0,0)
+            if collided:
+                self.currentColour = (255, 0, 0)
             # If there is a collision we do not need to check
             # the rest of the polygons.
             break
