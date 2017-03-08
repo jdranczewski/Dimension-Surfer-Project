@@ -2,6 +2,8 @@
 # Developed for the Dimension Surfer game, as part of a
 # Computer Science Project.
 
+import math
+
 # Project a given polygon onto an axis.
 def project(polygon, normal):
     # Create a list of projected vertices.
@@ -18,7 +20,7 @@ def project(polygon, normal):
         # Get the direction of the projection relative to the axis direction.
         sign_p = projected_v[0] * normal[0] + projected_v[1] * normal[1]
         # Apply the direction to the projected length.
-        projected_l = projected_l * (sign_p / abs(sign_p))
+        projected_l = math.copysign(projected_l, sign_p)
         # Append the calculated projection to the list of projected vertices.
         projected.append(projected_l)
     # After all vertices are processed, return the boundaries of the projection.
@@ -64,7 +66,7 @@ def getNormal(a, b):
     # Obtain the vector representing the edge...
     edge = [b[0] - a[0], b[1] - a[1]]
     # ...and its length.
-    length = math.sqrt(edge[0]^2 + edge[1]^2)
+    length = math.sqrt(edge[0]**2 + edge[1]**2)
     # Turn the edge vector into a unit vector.
     edge = [edge[0] / length, edge[1] / length]
     # Create a vector perpendicular to the unit edge vector...
