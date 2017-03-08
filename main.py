@@ -111,6 +111,36 @@ class Player():
         # Use pygame's built in draw rectangle function.
         pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
 
+# The class for the lava surfaces.
+class Lava(ThreeDMesh):
+    # A method for detecting collisions.
+    def collide(self, player):
+        # Take the current cross-section from the data array.
+        cSection = self.data[math.floor(self.z)]
+        # Iterate over the polygons in the current cross-section.
+        for obstacle in cSection:
+            # Check the x and y axes.
+            if not sat.checkOverlap(obstacle, player.vertices, [1,0]):
+                # If there is no overlap we can jump to the next
+                # polygon in the data set thanks to the SAT principles.
+                continue
+            if not sat.checkOverlap(obstacle, player.vertices, [0,1]):
+                continue
+            # Iterate over the polygon's edges.
+            for i in range(len(obstacle)):
+                # Get the normal to this edge...
+                normal = sat.getNormal(obstacle[i], obstacle[(i+1) % len(obstacle)])
+                # ...and check for overlap.
+                if not sat.checkOverlap(obstacle, player.vertices, normal):
+                    continue
+            # If we got past all the overlap checks and there was overlap
+            # on all the axes, it means that there is a collision, so we
+            # turn the polygon red (for testing).
+            self.currentColour = (255,0,0)
+            # If there is a collision we do not need to check
+            # the rest of the polygons.
+            break
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return min + z/500 * (max-min)
@@ -132,8 +162,8 @@ def main():
     # An object used to manage how fast the screen updates.
     clock = pygame.time.Clock()
 
-    # A simple ThreeDMesh for testing purposes.
-    mesh = ThreeDMesh("1", (0,0,255), (0,255,0))
+    # A simple Lava object for testing purposes.
+    mesh = Lava("1", (0,0,255), (0,255,0))
     player = Player(0,0,20,20)
 
     # Main program loop, runs until the close button is pressed.
@@ -153,6 +183,7 @@ def main():
         # Update the mesh.
         # mesh.update(mouse_y)
         player.update(mouse_x,mouse_y)
+        mesh.collide(player)
 
         # Do the drawing:
         screen.fill((255, 255, 255))
