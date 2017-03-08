@@ -240,7 +240,7 @@ def main():
     # An object used to manage how fast the screen updates.
     clock = pygame.time.Clock()
 
-    # A simple Lava object for testing purposes.
+    # A simple Level object for testing purposes.
     mesh = Level("1", (0,0,255), (0,255,0))
     player = Player(0,0,20,20)
 
