@@ -145,9 +145,9 @@ class Lava(ThreeDMesh):
             # turn the polygon red (for testing).
             if collided:
                 self.currentColour = (255, 0, 0)
-            # If there is a collision we do not need to check
-            # the rest of the polygons.
-            break
+                # If there is a collision we do not need to check
+                # the rest of the polygons.
+                break
 
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
