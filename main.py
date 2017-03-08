@@ -9,7 +9,7 @@ class ThreeDMesh():
     def __init__(self, id, baseColour, maxColour):
         self.id = id
         self.data = self.importData()
-        self.z = 250
+        self.z = 0
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = baseColour
@@ -121,8 +121,6 @@ class Player():
 class Lava(ThreeDMesh):
     # A method for detecting collisions.
     def collide(self, player):
-        # Set colour to blue for debugging purposes
-        self.currentColour = (0, 255, 0)
         # Take the current cross-section from the data array.
         cSection = self.data[math.floor(self.z)]
         # Iterate over the polygons in the current cross-section.
@@ -221,7 +219,7 @@ class Level(ThreeDMesh):
 
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
-    return min + z/500 * (max-min)
+    return math.floor(min + z/500 * (max-min))
 
 def main():
     # Initialize the pygame environment.
@@ -240,8 +238,9 @@ def main():
     # An object used to manage how fast the screen updates.
     clock = pygame.time.Clock()
 
-    # A simple Level object for testing purposes.
-    mesh = Level("1", (0,0,255), (0,255,0))
+    # Creating objects for testing:
+    level = Level("1_level", (33,150,243), (13,71,161))
+    lava = Lava("1_lava", (255,9,9), (180,0,0))
     player = Player(0,0,20,20)
 
     # Main program loop, runs until the close button is pressed.
@@ -258,14 +257,26 @@ def main():
         mouse_y = pos[1]
 
         # Game logic:
-        # Update the mesh.
-        # mesh.update(mouse_y)
-        player.update(mouse_x,mouse_y)
-        mesh.collide(player)
+        # Update level and lava based on mouse position
+        level.update(mouse_y)
+        lava.update(mouse_y)
+        # Move the player
+        player.update(mouse_x, mouse_y)
+        # Collide the player with the lava and the level
+        lava.collide(player)
+        level.collide(player)
 
         # Do the drawing:
-        screen.fill((255, 255, 255))
-        mesh.draw(screen)
+        # Set the backgorund color
+        backgroundBaseColour = (225,245,254)
+        backgroundMaxColour = (179,229,252)
+        screen.fill((
+            calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
+            calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
+            calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
+        # Draw the lava, the level and the player
+        lava.draw(screen)
+        level.draw(screen)
         player.draw(screen)
 
         # Update the screen:
