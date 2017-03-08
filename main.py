@@ -111,6 +111,11 @@ class Player():
         # Use pygame's built in draw rectangle function.
         pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
 
+    # Displace the player after collision.
+    def collisionDisplace(self, projectionVector):
+        # For debugging purposes print the collision vector.
+        print(projectionVector)
+
 # The class for the lava surfaces.
 class Lava(ThreeDMesh):
     # A method for detecting collisions.
@@ -149,6 +154,71 @@ class Lava(ThreeDMesh):
                 # the rest of the polygons.
                 break
 
+# The class for the level surfaces.
+class Level(ThreeDMesh):
+    # A method for detecting collisions.
+    def collide(self, player):
+        self.currentColour = (0, 255, 0)
+        # Take the current cross-section from the data array.
+        cSection = self.data[math.floor(self.z)]
+        # Iterate over the polygons in the current cross-section.
+        for obstacle in cSection:
+            # Create lists for holding projection vector lengths
+            # and the vectors.
+            projectionVectorsLenghts = []
+            projectionVectors = []
+            # Check the x and y axes.
+            vectors = sat.calculateProjectionVectors(obstacle, player.vertices, [1, 0])
+            # If the calculateProjectionVectors function did not return false,
+            # it means that it successfully found projection vectors...
+            if vectors:
+                # ...which we can add to our lists.
+                projectionVectorsLenghts.append(vectors[0])
+                projectionVectors.append(vectors[1])
+                projectionVectorsLenghts.append(vectors[2])
+                projectionVectors.append(vectors[3])
+            else:
+                continue
+
+            vectors = sat.calculateProjectionVectors(obstacle, player.vertices, [0, 1])
+            if vectors:
+                projectionVectorsLenghts.append(vectors[0])
+                projectionVectors.append(vectors[1])
+                projectionVectorsLenghts.append(vectors[2])
+                projectionVectors.append(vectors[3])
+            else:
+                continue
+
+            # Iterate over the polygon's edges.
+            # We assume that there is overlap unless proven otherwise.
+            collided = 1
+            for i in range(len(obstacle)):
+                # Get the normal to this edge...
+                normal = sat.getNormal(obstacle[i], obstacle[(i + 1) % len(obstacle)])
+                # ...and check for overlap, if the axis is not the x or y axis.
+                if (normal[0] * normal[1] != 0):
+                    vectors = sat.calculateProjectionVectors(obstacle, player.vertices, normal)
+                    if vectors:
+                        projectionVectorsLenghts.append(vectors[0])
+                        projectionVectors.append(vectors[1])
+                        projectionVectorsLenghts.append(vectors[2])
+                        projectionVectors.append(vectors[3])
+                    else:
+                        # Stop checking the edges and rise the flag that
+                        # there is no overlap.
+                        collided = 0
+                        break
+            # If we got past all the overlap checks and there was overlap
+            # on all the axes, it means that there is a collision.
+            if collided:
+                # Find the index of the shortest vector...
+                minimumIndex = projectionVectorsLenghts.index(min(projectionVectorsLenghts))
+                # ...and pass it to the player.
+                player.collisionDisplace(projectionVectors[minimumIndex])
+                # If there is a collision we do not need to check
+                # the rest of the polygons.
+                break
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return min + z/500 * (max-min)
@@ -171,7 +241,7 @@ def main():
     clock = pygame.time.Clock()
 
     # A simple Lava object for testing purposes.
-    mesh = Lava("1", (0,0,255), (0,255,0))
+    mesh = Level("1", (0,0,255), (0,255,0))
     player = Player(0,0,20,20)
 
     # Main program loop, runs until the close button is pressed.
