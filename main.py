@@ -114,7 +114,8 @@ class Player():
     # Displace the player after collision.
     def collisionDisplace(self, projectionVector):
         # For debugging purposes print the collision vector.
-        print(projectionVector)
+        self.x += projectionVector[0]
+        self.y += projectionVector[1]
 
 # The class for the lava surfaces.
 class Lava(ThreeDMesh):
@@ -158,7 +159,6 @@ class Lava(ThreeDMesh):
 class Level(ThreeDMesh):
     # A method for detecting collisions.
     def collide(self, player):
-        self.currentColour = (0, 255, 0)
         # Take the current cross-section from the data array.
         cSection = self.data[math.floor(self.z)]
         # Iterate over the polygons in the current cross-section.
