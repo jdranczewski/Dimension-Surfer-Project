@@ -89,12 +89,18 @@ class ThreeDMesh():
 
 # The simplified Player class for testing purposes.
 class Player():
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, baseColour, maxColour):
         # Set the attributes to the values given.
         self.x = x
         self.y = y
+        self.xSpeed = 0
+        self.ySpeed = 0
+        self.xAcceleration = 2
+        self.yAcceleration = 0.2
         self.width = width
         self.height = height
+        self.baseColour = baseColour
+        self.maxColour = maxColour
         # Create the vertices list
         self.vertices = []
 
@@ -107,15 +113,25 @@ class Player():
         self.vertices = [[self.x, self.y], [self.x + self.width, self.y], [self.x + self.width, self.y + self.height], [self.x, self.y + self.height]]
 
     # Draw the Player.
-    def draw(self, screen):
+    def draw(self, screen, levelZ):
+        # Calculate the colour to be used while drawing.
+        colour = (calculateColour(self.baseColour[0], self.maxColour[0], levelZ),
+                  calculateColour(self.baseColour[1], self.maxColour[1], levelZ),
+                  calculateColour(self.baseColour[2], self.maxColour[2], levelZ))
         # Use pygame's built in draw rectangle function.
-        pygame.draw.rect(screen, (0, 0, 0), [self.x, self.y, self.width, self.height])
+        pygame.draw.rect(screen, colour, [self.x, self.y, self.width, self.height])
 
     # Displace the player after collision.
     def collisionDisplace(self, projectionVector):
-        # For debugging purposes print the collision vector.
+        # Change the player's x and y coordinates according to the projection vector.
         self.x += projectionVector[0]
         self.y += projectionVector[1]
+
+    # Reset the Player's position.
+    def reset(self):
+        # Set the x and y coordinates to zero.
+        self.x = 0
+        self.y = 0
 
 # The class for the lava surfaces.
 class Lava(ThreeDMesh):
@@ -146,9 +162,9 @@ class Lava(ThreeDMesh):
                     break
             # If we got past all the overlap checks and there was overlap
             # on all the axes, it means that there is a collision, so we
-            # turn the polygon red (for testing).
+            # reset the level.
             if collided:
-                self.currentColour = (255, 0, 0)
+                player.reset()
                 # If there is a collision we do not need to check
                 # the rest of the polygons.
                 break
@@ -241,7 +257,7 @@ def main():
     # Creating objects for testing:
     level = Level("1_level", (33,150,243), (13,71,161))
     lava = Lava("1_lava", (255,9,9), (180,0,0))
-    player = Player(0,0,20,20)
+    player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
 
     # Main program loop, runs until the close button is pressed.
     while not done:
@@ -277,7 +293,7 @@ def main():
         # Draw the lava, the level and the player
         lava.draw(screen)
         level.draw(screen)
-        player.draw(screen)
+        player.draw(screen, level.z)
 
         # Update the screen:
         pygame.display.flip()
