@@ -258,6 +258,8 @@ def main():
     level = Level("1_level", (33,150,243), (13,71,161))
     lava = Lava("1_lava", (255,9,9), (180,0,0))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
+    xSpeed = 0
+    ySpeed = 0
 
     # Main program loop, runs until the close button is pressed.
     while not done:
@@ -267,6 +269,35 @@ def main():
             # So we set done to True.
             if event.type == pygame.QUIT:
                 done = True
+            # Handle the keydown events.
+            elif event.type == pygame.KEYDOWN:
+                # Go left.
+                if event.key == "a" or event.key == "left":
+                    leftPressed = 1
+                    xSpeed = -1
+                # Go right.
+                elif event.key == "d" or event.key == "right":
+                    rightPressed = 1
+                    xSpeed = 1
+                    # Jump.
+                elif event.key == "w" or event.key == "space" or event.key == "up":
+                    ySpeed = -1
+            # Handle the keyup events.
+            elif event.type == "keyup":
+                if event.key == "a" or event.key == "left":
+                    leftPressed = 0
+                    xSpeed = 0
+                    # If right is still pressed, start going right.
+                    if rightPressed == 1:
+                        xSpeed = 1
+                elif event.key == "d" or event.key == "right":
+                    rightPressed = 0
+                    xSpeed = 0
+                    # If left is still pressed, start going left.
+                    if leftPressed == 1:
+                        xSpeed = -1
+                elif event.key == "w" or event.key == "space" or event.key == "up":
+                    ySpeed = 0
         # Get the mouse coordinates.
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
@@ -277,7 +308,7 @@ def main():
         level.update(mouse_y)
         lava.update(mouse_y)
         # Move the player
-        player.update(mouse_x, mouse_y)
+        player.update(xSpeed, ySpeed)
         # Collide the player with the lava and the level
         lava.collide(player)
         level.collide(player)
