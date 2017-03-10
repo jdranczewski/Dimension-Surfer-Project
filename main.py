@@ -101,14 +101,27 @@ class Player():
         self.height = height
         self.baseColour = baseColour
         self.maxColour = maxColour
+        self.yPV = 0
         # Create the vertices list
         self.vertices = []
 
-    # Update the position every refresh based on mouse position.
-    def update(self, mouse_x, mouse_y):
-        # Set the coordinates to the mouse coordinates.
-        self.x = mouse_x
-        self.y = mouse_y
+    # Update the position every refresh based on keyboard input.
+    def update(self, xSpeed, ySpeed):
+        # Set xSpeed based on left/right keys pressed.
+        self.xSpeed = xSpeed * self.xAcceleration
+        # Add a constant to the ySpeed to simulate freefall.
+        self.ySpeed += self.yAcceleration
+        # Set a speed limit.
+        if self.ySpeed > 5:
+            self.ySpeed = 5
+        # Jump if conditions are met.
+        if ySpeed == -1 and self.yPV < 0:
+            self.ySpeed = -5
+        # Reset the stored y component of the projection vector.
+        self.yPV = 0
+        # Add the speeds to the coordinates.
+        self.x += self.xSpeed
+        self.y += self.ySpeed
         # Calculate the coordinates of the rectangle's vertices.
         self.vertices = [[self.x, self.y], [self.x + self.width, self.y], [self.x + self.width, self.y + self.height], [self.x, self.y + self.height]]
 
@@ -126,6 +139,10 @@ class Player():
         # Change the player's x and y coordinates according to the projection vector.
         self.x += projectionVector[0]
         self.y += projectionVector[1]
+        # Save the y component of the projection vector for use in update()
+        self.yPV = projectionVector[1]
+        # Reset the ySpeed after collision
+        self.ySpeed = 0
 
     # Reset the Player's position.
     def reset(self):
@@ -255,11 +272,13 @@ def main():
     clock = pygame.time.Clock()
 
     # Creating objects for testing:
-    level = Level("1_level", (33,150,243), (13,71,161))
+    level = Level("1", (33,150,243), (13,71,161))
     lava = Lava("1_lava", (255,9,9), (180,0,0))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
     xSpeed = 0
     ySpeed = 0
+    leftPressed = 0
+    rightPressed = 0
 
     # Main program loop, runs until the close button is pressed.
     while not done:
@@ -272,31 +291,31 @@ def main():
             # Handle the keydown events.
             elif event.type == pygame.KEYDOWN:
                 # Go left.
-                if event.key == "a" or event.key == "left":
+                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     leftPressed = 1
                     xSpeed = -1
                 # Go right.
-                elif event.key == "d" or event.key == "right":
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     rightPressed = 1
                     xSpeed = 1
                     # Jump.
-                elif event.key == "w" or event.key == "space" or event.key == "up":
+                elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     ySpeed = -1
             # Handle the keyup events.
-            elif event.type == "keyup":
-                if event.key == "a" or event.key == "left":
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
                     leftPressed = 0
                     xSpeed = 0
                     # If right is still pressed, start going right.
                     if rightPressed == 1:
                         xSpeed = 1
-                elif event.key == "d" or event.key == "right":
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
                     rightPressed = 0
                     xSpeed = 0
                     # If left is still pressed, start going left.
                     if leftPressed == 1:
                         xSpeed = -1
-                elif event.key == "w" or event.key == "space" or event.key == "up":
+                elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                     ySpeed = 0
         # Get the mouse coordinates.
         pos = pygame.mouse.get_pos()
