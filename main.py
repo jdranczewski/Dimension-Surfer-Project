@@ -115,7 +115,7 @@ class Player():
         if self.ySpeed > 5:
             self.ySpeed = 5
         # Jump if conditions are met.
-        if ySpeed == -1 and self.yPV < 0:
+        if ySpeed == -1 and self.yPV < -0.1:
             self.ySpeed = -5
         # Reset the stored y component of the projection vector.
         self.yPV = 0
@@ -142,13 +142,16 @@ class Player():
         # Save the y component of the projection vector for use in update()
         self.yPV = projectionVector[1]
         # Reset the ySpeed after collision
-        self.ySpeed = 0
+        if projectionVector[1] < 0:
+            self.ySpeed *= abs(projectionVector[0]) / math.sqrt(projectionVector[0] ** 2 + projectionVector[1] ** 2)
 
     # Reset the Player's position.
     def reset(self):
         # Set the x and y coordinates to zero.
         self.x = 0
         self.y = 0
+        # Reset the ySpeed.
+        self.ySpeed = 0
 
 # The class for the lava surfaces.
 class Lava(ThreeDMesh):
