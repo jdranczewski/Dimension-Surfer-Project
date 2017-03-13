@@ -253,6 +253,48 @@ class Level(ThreeDMesh):
                 # the rest of the polygons.
                 break
 
+# The class that handles all things related to stars
+class Stars():
+    def __init__(self, id, baseColour, maxColour):
+        # Set the attributes
+        self.id = id
+        self.z = 0
+        # Import the data from a text file
+        self.data = self.importData()
+        self.baseColour = baseColour
+        self.maxColour = maxColour
+        self.currentColour = self.baseColour
+
+    # Import the data about the stars
+    def importData(self):
+        # Create a temporary data list.
+        data = []
+        # Open the data file.
+        with open('level_data/' + self.id + ".txt", 'r') as f:
+            # Parse every line in the file.
+            for line in f:
+                # Create a temporary list for every star and append coordinates
+                star = [int(x) for x in line.split(" ")]
+                # Append the state of the star. 1 is uncollected.
+                star.append(0)
+                # Append the star list to the data list.
+                data.append(star)
+        # Ensure that the file is closed.
+        f.closed
+        # Return the data array
+        return data
+
+    # Draw a single star.
+    def drawStar(self, screen, x, y, state):
+        # The basic star vertices
+        vertices = [[32,10],[20,10],[16,0],[12,10],[0,10],[9,19],[6,30],[16,24],[26,30],[23,19],[32,10]]
+        # Add the given x and y coordinates to the star's vertices.
+        correctedVertices = [[v[0] + x, v[1] + y] for v in vertices]
+        # Draw the star. The state is used as width. If it is 0 (uncollected),
+        # the polygon is filled, if it is 1 (collected), a border of width 3 is drawn.
+        pygame.draw.polygon(screen, self.currentColour, correctedVertices, state*3)
+
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return math.floor(min + z/500 * (max-min))
@@ -275,8 +317,9 @@ def main():
     clock = pygame.time.Clock()
 
     # Creating objects for testing:
-    level = Level("1", (33,150,243), (13,71,161))
+    level = Level("1_level", (33,150,243), (13,71,161))
     lava = Lava("1_lava", (255,9,9), (180,0,0))
+    stars = Stars("1_stars", (255,9,9), (180,0,0))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
     xSpeed = 0
     ySpeed = 0
@@ -324,6 +367,7 @@ def main():
         pos = pygame.mouse.get_pos()
         mouse_x = pos[0]
         mouse_y = pos[1]
+        # print(mouse_x, mouse_y)
 
         # Game logic:
         # Update level and lava based on mouse position
