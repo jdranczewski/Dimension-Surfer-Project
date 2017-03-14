@@ -259,6 +259,7 @@ class Stars():
         # Set the attributes
         self.id = id
         self.z = 0
+        self.score = 0
         # Import the data from a text file
         self.data = self.importData()
         self.baseColour = baseColour
@@ -294,6 +295,21 @@ class Stars():
         # the polygon is filled, if it is 1 (collected), a border of width 3 is drawn.
         pygame.draw.polygon(screen, self.currentColour, correctedVertices, state*3)
 
+    # Draw the stars and the star score.
+    def draw(self, screen):
+        # Iterate on the stars in the data array.
+        for star in self.data:
+            # Draw the stars.
+            self.drawStar(screen, star[0], star[1], star[2])
+        # Render the star score.
+        for i in range(len(self.data)):
+            if i > self.score-1:
+                # Draw an empty star.
+                self.drawStar(screen, 5+i*40, 5, 1)
+            else:
+                # Draw a full star.
+                self.drawStar(screen, 5+i*40, 5, 0)
+
 
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
@@ -319,7 +335,7 @@ def main():
     # Creating objects for testing:
     level = Level("1_level", (33,150,243), (13,71,161))
     lava = Lava("1_lava", (255,9,9), (180,0,0))
-    stars = Stars("1_stars", (255,9,9), (180,0,0))
+    stars = Stars("1_stars", (255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
     xSpeed = 0
     ySpeed = 0
@@ -387,9 +403,10 @@ def main():
             calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
             calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
             calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
-        # Draw the lava, the level and the player
+        # Draw the lava, the level, stars and the player
         lava.draw(screen)
         level.draw(screen)
+        stars.draw(screen)
         player.draw(screen, level.z)
 
         # Update the screen:
