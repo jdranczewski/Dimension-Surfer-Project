@@ -375,76 +375,85 @@ def main():
     leftPressed = 0
     rightPressed = 0
 
+    state = 1
     # Main program loop, runs until the close button is pressed.
     while not done:
-        # Event processing - we iterate on the events given to us by pygame:
-        for event in pygame.event.get():
-            # If the event type is QUIT, the user wants to close the window.
-            # So we set done to True.
-            if event.type == pygame.QUIT:
-                done = True
-            # Handle the keydown events.
-            elif event.type == pygame.KEYDOWN:
-                # Go left.
-                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    leftPressed = 1
-                    xSpeed = -1
-                # Go right.
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    rightPressed = 1
-                    xSpeed = 1
-                    # Jump.
-                elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-                    ySpeed = -1
-            # Handle the keyup events.
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    leftPressed = 0
-                    xSpeed = 0
-                    # If right is still pressed, start going right.
-                    if rightPressed == 1:
-                        xSpeed = 1
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    rightPressed = 0
-                    xSpeed = 0
-                    # If left is still pressed, start going left.
-                    if leftPressed == 1:
+        if state == -1:
+            # Show the winning screen.
+            print("win")
+        elif state == 0:
+            # Show the main screen.
+            print("main")
+        elif state < 9:
+            # Show the level indicated by the state variable.
+            # Event processing - we iterate on the events given to us by pygame:
+            for event in pygame.event.get():
+                # If the event type is QUIT, the user wants to close the window.
+                # So we set done to True.
+                if event.type == pygame.QUIT:
+                    done = True
+                # Handle the keydown events.
+                elif event.type == pygame.KEYDOWN:
+                    # Go left.
+                    if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        leftPressed = 1
                         xSpeed = -1
-                elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-                    ySpeed = 0
-        # Get the mouse coordinates.
-        pos = pygame.mouse.get_pos()
-        mouse_x = pos[0]
-        mouse_y = pos[1]
-        # print(mouse_x, mouse_y)
+                    # Go right.
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        rightPressed = 1
+                        xSpeed = 1
+                        # Jump.
+                    elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                        ySpeed = -1
+                # Handle the keyup events.
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        leftPressed = 0
+                        xSpeed = 0
+                        # If right is still pressed, start going right.
+                        if rightPressed == 1:
+                            xSpeed = 1
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        rightPressed = 0
+                        xSpeed = 0
+                        # If left is still pressed, start going left.
+                        if leftPressed == 1:
+                            xSpeed = -1
+                    elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                        ySpeed = 0
+            # Get the mouse coordinates.
+            pos = pygame.mouse.get_pos()
+            mouse_x = pos[0]
+            mouse_y = pos[1]
+            # print(mouse_x, mouse_y)
 
-        # Game logic:
-        # Update level and lava based on mouse position
-        level.update(mouse_y)
-        lava.update(mouse_y)
-        # Move the player
-        player.update(xSpeed, ySpeed)
-        # Collide the player with the lava and the level
-        lava.collide(player, stars)
-        level.collide(player)
-        stars.update(mouse_y, player)
+            # Game logic:
+            # Update level and lava based on mouse position
+            level.update(mouse_y)
+            lava.update(mouse_y)
+            # Move the player
+            player.update(xSpeed, ySpeed)
+            # Collide the player with the lava and the level
+            lava.collide(player, stars)
+            level.collide(player)
+            stars.update(mouse_y, player)
 
-        # Do the drawing:
-        # Set the backgorund color
-        backgroundBaseColour = (225,245,254)
-        backgroundMaxColour = (179,229,252)
-        screen.fill((
-            calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
-            calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
-            calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
-        # Draw the lava, the level, stars and the player
-        lava.draw(screen)
-        level.draw(screen)
-        stars.draw(screen)
-        player.draw(screen, level.z)
+            # Do the drawing:
+            # Set the backgorund color
+            backgroundBaseColour = (225,245,254)
+            backgroundMaxColour = (179,229,252)
+            screen.fill((
+                calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
+                calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
+                calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
+            # Draw the lava, the level, stars and the player
+            lava.draw(screen)
+            level.draw(screen)
+            stars.draw(screen)
+            player.draw(screen, level.z)
 
-        # Update the screen:
-        pygame.display.flip()
+            # Update the screen:
+            pygame.display.flip()
 
         # Show the frame rate in the title for performance checking.
         pygame.display.set_caption(str(clock.get_fps()))
