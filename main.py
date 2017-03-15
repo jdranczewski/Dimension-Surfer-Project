@@ -374,8 +374,15 @@ def main():
     ySpeed = 0
     leftPressed = 0
     rightPressed = 0
+    s = open("scores.txt", 'r')
+    scores = [int(x) for x in s.read().split(" ")]
+    s.close()
+    # Load the necessary images.
+    backgroundImage = pygame.image.load("images/main_background.png").convert()
+    lockedImage = pygame.image.load("images/locked.png").convert_alpha()
 
-    state = 1
+    state = 0
+    firstDraw = 1
     # Main program loop, runs until the close button is pressed.
     while not done:
         if state == -1:
@@ -383,7 +390,38 @@ def main():
             print("win")
         elif state == 0:
             # Show the main screen.
-            print("main")
+            for event in pygame.event.get():
+                # If the event type is QUIT, the user wants to close the window.
+                # So we set done to True.
+                if event.type == pygame.QUIT:
+                    done = True
+            # Check if drawing needs to be done.
+            if firstDraw:
+                # Draw the background.
+                screen.blit(backgroundImage, [0, 0])
+                # Iterate on the list of scores
+                for i in range(len(scores)):
+                    # If the level is locked display three empty stars
+                    # and a locked badge.
+                    if scores[i] < 0:
+                        for j in range(3):
+                            # We use the drawStar() method od the Stars class.
+                            stars.drawStar(screen, 31 + i%4*113 + j*33, 285 + i//4*113, 1)
+                        screen.blit(lockedImage, [28 + i%4*113, 217 + i//4*113])
+                    # If the level is not locked, display the star score
+                    # using a loop almost identical to that used in the draw()
+                    # method of the Stars class.
+                    else:
+                        for j in range(3):
+                            if j > scores[i] - 1:
+                                stars.drawStar(screen, 31 + i%4*113 + j*33, 285 + i//4*113, 1)
+                            else:
+                                stars.drawStar(screen, 31 + i%4*113 + j*33, 285 + i//4*113, 0)
+                # Refresh the screen
+                pygame.display.flip()
+                # Indicate that there is no need for further drawing.
+                firstDraw = 0
+
         elif state < 9:
             # Show the level indicated by the state variable.
             # Event processing - we iterate on the events given to us by pygame:
