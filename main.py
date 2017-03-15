@@ -395,6 +395,13 @@ def main():
                 # So we set done to True.
                 if event.type == pygame.QUIT:
                     done = True
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
+                    mouse_x = pos[0]
+                    mouse_y = pos[1]
+                    if mouse_x >= 24 and mouse_x <= 475 and mouse_y >= 217 and mouse_y <= 438:
+                        levelIndex = 4*((mouse_y-213)//113) + (mouse_x-24)//113 + 1
+                        print(levelIndex)
             # Check if drawing needs to be done.
             if firstDraw:
                 # Draw the background.
