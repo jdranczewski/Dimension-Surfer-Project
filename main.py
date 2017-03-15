@@ -156,7 +156,7 @@ class Player():
 # The class for the lava surfaces.
 class Lava(ThreeDMesh):
     # A method for detecting collisions.
-    def collide(self, player):
+    def collide(self, player, stars):
         # Take the current cross-section from the data array.
         cSection = self.data[math.floor(self.z)]
         # Iterate over the polygons in the current cross-section.
@@ -185,6 +185,7 @@ class Lava(ThreeDMesh):
             # reset the level.
             if collided:
                 player.reset()
+                stars.reset()
                 # If there is a collision we do not need to check
                 # the rest of the polygons.
                 break
@@ -310,6 +311,38 @@ class Stars():
                 # Draw a full star.
                 self.drawStar(screen, 5+i*40, 5, 0)
 
+    # Update the stars.
+    def update(self, mouse_y, player):
+        # Use the self.z and colour updating algorithm from the ThreeDMesh class.
+        diff = mouse_y - self.z
+        if abs(diff) > 50:
+            diff = 50 * abs(diff) / diff
+        self.z += diff * 0.1
+        self.currentColour = (
+            calculateColour(self.baseColour[0], self.maxColour[0], self.z),
+            calculateColour(self.baseColour[1], self.maxColour[1], self.z),
+            calculateColour(self.baseColour[2], self.maxColour[2], self.z))
+        # Iterate on the stars to check for collisions.
+        for star in self.data:
+            # Check for overlap. We get the projections by adding
+            # width and height to respective coordinates.
+            if not star[2] and not (player.x + player.width < star[0])\
+                    and not (player.x > star[0] + 32)\
+                    and not (player.y + player.height < star[1])\
+                    and not (player.y > star[1] + 32):
+                # If there is a collision, set the star to collected...
+                star[2] = 1
+                # ...and add one to the score.
+                self.score += 1
+
+    # Reset the stars' state and the star score.
+    def reset(self):
+        # Set the score to zero.
+        self.score = 0
+        # Iterate on the stars...
+        for star in self.data:
+            # ...setting their state to uncllected.
+            star[2] = 0
 
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
@@ -392,8 +425,9 @@ def main():
         # Move the player
         player.update(xSpeed, ySpeed)
         # Collide the player with the lava and the level
-        lava.collide(player)
+        lava.collide(player, stars)
         level.collide(player)
+        stars.update(mouse_y, player)
 
         # Do the drawing:
         # Set the backgorund color
