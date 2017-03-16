@@ -390,17 +390,24 @@ def main():
             print("win")
         elif state == 0:
             # Show the main screen.
+            # Iterate on the events given by pygame.
             for event in pygame.event.get():
                 # If the event type is QUIT, the user wants to close the window.
                 # So we set done to True.
                 if event.type == pygame.QUIT:
                     done = True
+                # If the event type is MOUSEBUTTONDOWN, we assume that the user
+                # may be trying to choose a level.
                 elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # Get the mouse position.
                     pos = pygame.mouse.get_pos()
                     mouse_x = pos[0]
                     mouse_y = pos[1]
+                    # Check whether the cursor is in the level choice area.
                     if mouse_x >= 24 and mouse_x <= 475 and mouse_y >= 217 and mouse_y <= 438:
+                        # Calculate the selected level inded.
                         levelIndex = 4*((mouse_y-213)//113) + (mouse_x-24)//113 + 1
+                        # Print the level index for testing purposes.
                         print(levelIndex)
             # Check if drawing needs to be done.
             if firstDraw:
