@@ -14,8 +14,11 @@ class ThreeDMesh():
 
     # Set the object to a given level.
     def set(self, id):
+        # Reset the self.z attribute to start each level at the same z position.
+        self.z = 0
+        # Set the id.
         self.id = id
-        # Import the data from a text file
+        # Import the data from a text file.
         self.data = self.importData()
 
     # This method will import polygon data from a text file.
@@ -270,6 +273,9 @@ class Stars():
 
     # Set the object to a given level.
     def set(self, id):
+        # Reset the self.z attribute to start each level at the same z position.
+        self.z = 0
+        # Set the id.
         self.id = id
         # Import the data from a text file
         self.data = self.importData()
@@ -420,6 +426,13 @@ def main():
                             level.set(str(levelIndex) + "_level")
                             lava.set(str(levelIndex) + "_lava")
                             stars.set(str(levelIndex) + "_stars")
+                            # Reset the player's position...
+                            player.reset()
+                            # ...and all the navigation variables.
+                            leftPressed = 0
+                            rightPressed = 0
+                            xSpeed = 0
+                            ySpeed = 0
                             # Change the state to the given level.
                             state = levelIndex
             # Check if drawing needs to be done.
@@ -470,6 +483,11 @@ def main():
                         # Jump.
                     elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                         ySpeed = -1
+                    elif event.key == pygame.K_ESCAPE:
+                        # If the user wants to go to the main screen, set firstDraw to one so that
+                        # the main screen is drawn, and then switch state.
+                        firstDraw = 1
+                        state = 0
                 # Handle the keyup events.
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_a or event.key == pygame.K_LEFT:
