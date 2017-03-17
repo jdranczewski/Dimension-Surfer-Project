@@ -6,13 +6,17 @@ import sat
 
 
 class ThreeDMesh():
-    def __init__(self, id, baseColour, maxColour):
-        self.id = id
-        self.data = self.importData()
+    def __init__(self, baseColour, maxColour):
         self.z = 0
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = baseColour
+
+    # Set the object to a given level.
+    def set(self, id):
+        self.id = id
+        # Import the data from a text file
+        self.data = self.importData()
 
     # This method will import polygon data from a text file.
     def importData(self):
@@ -256,16 +260,19 @@ class Level(ThreeDMesh):
 
 # The class that handles all things related to stars
 class Stars():
-    def __init__(self, id, baseColour, maxColour):
+    def __init__(self, baseColour, maxColour):
         # Set the attributes
-        self.id = id
         self.z = 0
         self.score = 0
-        # Import the data from a text file
-        self.data = self.importData()
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = self.baseColour
+
+    # Set the object to a given level.
+    def set(self, id):
+        self.id = id
+        # Import the data from a text file
+        self.data = self.importData()
 
     # Import the data about the stars
     def importData(self):
@@ -366,9 +373,9 @@ def main():
     clock = pygame.time.Clock()
 
     # Creating objects for testing:
-    level = Level("1_level", (33,150,243), (13,71,161))
-    lava = Lava("1_lava", (255,9,9), (180,0,0))
-    stars = Stars("1_stars", (255,238,88), (253,216,53))
+    level = Level((33,150,243), (13,71,161))
+    lava = Lava((255,9,9), (180,0,0))
+    stars = Stars((255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
     xSpeed = 0
     ySpeed = 0
@@ -405,10 +412,16 @@ def main():
                     mouse_y = pos[1]
                     # Check whether the cursor is in the level choice area.
                     if mouse_x >= 24 and mouse_x <= 475 and mouse_y >= 217 and mouse_y <= 438:
-                        # Calculate the selected level inded.
+                        # Calculate the selected level index.
                         levelIndex = 4*((mouse_y-213)//113) + (mouse_x-24)//113 + 1
-                        # Print the level index for testing purposes.
-                        print(levelIndex)
+                        # If the level is unlocked, change the state.
+                        if scores[levelIndex-1] >= 0:
+                            # Set the data in the level-related objects.
+                            level.set(str(levelIndex) + "_level")
+                            lava.set(str(levelIndex) + "_lava")
+                            stars.set(str(levelIndex) + "_stars")
+                            # Change the state to the given level.
+                            state = levelIndex
             # Check if drawing needs to be done.
             if firstDraw:
                 # Draw the background.
