@@ -383,10 +383,6 @@ def main():
     lava = Lava((255,9,9), (180,0,0))
     stars = Stars((255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
-    xSpeed = 0
-    ySpeed = 0
-    leftPressed = 0
-    rightPressed = 0
     s = open("scores.txt", 'r')
     scores = [int(x) for x in s.read().split(" ")]
     s.close()
