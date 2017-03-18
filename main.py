@@ -266,7 +266,6 @@ class Stars():
     def __init__(self, baseColour, maxColour):
         # Set the attributes
         self.z = 0
-        self.score = 0
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = self.baseColour
@@ -277,6 +276,8 @@ class Stars():
         self.z = 0
         # Set the id.
         self.id = id
+        # Reset the score.
+        self.score = 0
         # Import the data from a text file
         self.data = self.importData()
 
@@ -389,6 +390,9 @@ def main():
     # Load the necessary images.
     backgroundImage = pygame.image.load("images/main_background.png").convert()
     lockedImage = pygame.image.load("images/locked.png").convert_alpha()
+    youWinImage = pygame.image.load("images/you_win.png").convert_alpha()
+    newHighScoreImage = pygame.image.load("images/new_high_score.png").convert_alpha()
+    prevHighScoreImage = pygame.image.load("images/prev_high_score.png").convert_alpha()
 
     state = 0
     firstDraw = 1
@@ -396,7 +400,57 @@ def main():
     while not done:
         if state == -1:
             # Show the winning screen.
-            print("win")
+            if firstDraw:
+                # Render the backgorund.
+                screen.blit(youWinImage, [0, 0])
+                # Check if the current high score has been beaten.
+                if stars.score > scores[levelIndex-1]:
+                    # If yes, then draw the "New High Score" message.
+                    screen.blit(newHighScoreImage, [281, 267])
+                    # Change the stored high score to the current score
+                    scores[levelIndex-1] = stars.score
+                    # If the next level is not unlocked, unlock it.
+                    if scores[levelIndex] < 0:
+                        scores[levelIndex] = 0
+                    # Save the scores to the scores.txt file.
+                    s = open("scores.txt", 'w')
+                    s.write(" ".join([str(x) for x in scores]))
+                    s.close()
+                else:
+                    # If the high score has not been beaten, render the
+                    # "Current High Score" message.
+                    screen.blit(prevHighScoreImage, [331, 267])
+                    # Render the current high score using stars
+                    # and the algorithm used for that on the main screen.
+                    for i in range(3):
+                        if i > scores[levelIndex-1] - 1:
+                            stars.drawStar(screen, 350 + i * 33, 330, 1)
+                        else:
+                            stars.drawStar(screen, 350 + i * 33, 330, 0)
+                # Render the current score using stars
+                # and the algorithm used for that on the main screen.
+                for i in range(3):
+                    if i > stars.score - 1:
+                        stars.drawStar(screen, 54 + i * 33, 330, 1)
+                    else:
+                        stars.drawStar(screen, 54 + i * 33, 330, 0)
+                # Refresh the screen
+                pygame.display.flip()
+                # Indicate that the screen has been drawn already.
+                firstDraw = 0
+            # The event loop must in this case be after the drawing part. If it wasn't
+            # organised this way, setting firstDraw to one in the event loop would
+            # trigger drawing the "You Win" screen instead of the main screen.
+            for event in pygame.event.get():
+                # If the event type is QUIT, the user wants to close the window.
+                # So we set done to True.
+                if event.type == pygame.QUIT:
+                    done = True
+                # If any key is pressed or the mouse is clicked, we go to the main screen.
+                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                    firstDraw = 1
+                    state = 0
+
         elif state == 0:
             # Show the main screen.
             # Iterate on the events given by pygame.
@@ -530,6 +584,11 @@ def main():
             level.draw(screen)
             stars.draw(screen)
             player.draw(screen, level.z)
+
+            # Change state if player won.
+            if player.x >= 500:
+                firstDraw = 1
+                state = -1
 
             # Update the screen:
             pygame.display.flip()
