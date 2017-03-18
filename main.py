@@ -358,6 +358,35 @@ class Stars():
             # ...setting their state to uncllected.
             star[2] = 0
 
+# A class for displaying the tutorial
+class Tutorial():
+    def __init__(self):
+        # Set the state and current frame to zero.
+        self.state = 0
+        self.frame = 0
+        # Load the images
+        self.firstImage = pygame.image.load("images/wsad.png").convert()
+        self.secondImage = pygame.image.load("images/animationsheet.jpg").convert()
+
+    # Change to the next state
+    def next(self):
+        self.state += 1
+
+    # Draw the image corresponding to the state
+    def draw(self, screen):
+        if self.state == 0:
+            # Draw the image explaining the use of the WSAD keys
+            screen.blit(self.firstImage, [0,150])
+        if self.state == 1:
+            # Draw the animation explaining the concept of the third dimension.
+            # Increase the frame counter.
+            self.frame += 1
+            # Calculate the frame to render.
+            renderFrame = (self.frame//8)%24
+            # Cut the animation sheet accoridng to the renderFrame variable
+            # and render it on screen.
+            screen.blit(self.secondImage, [0,150], [0, renderFrame*200, 500, 200])
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return math.floor(min + z/500 * (max-min))
@@ -384,6 +413,7 @@ def main():
     lava = Lava((255,9,9), (180,0,0))
     stars = Stars((255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
+    tutorial = Tutorial()
     s = open("scores.txt", 'r')
     scores = [int(x) for x in s.read().split(" ")]
     s.close()
@@ -409,9 +439,6 @@ def main():
                     screen.blit(newHighScoreImage, [281, 267])
                     # Change the stored high score to the current score
                     scores[levelIndex-1] = stars.score
-                    # If the next level is not unlocked, unlock it.
-                    if scores[levelIndex] < 0:
-                        scores[levelIndex] = 0
                     # Save the scores to the scores.txt file.
                     s = open("scores.txt", 'w')
                     s.write(" ".join([str(x) for x in scores]))
@@ -427,6 +454,9 @@ def main():
                             stars.drawStar(screen, 350 + i * 33, 330, 1)
                         else:
                             stars.drawStar(screen, 350 + i * 33, 330, 0)
+                # If the next level is not unlocked, unlock it.
+                if scores[levelIndex] < 0:
+                    scores[levelIndex] = 0
                 # Render the current score using stars
                 # and the algorithm used for that on the main screen.
                 for i in range(3):
@@ -554,6 +584,9 @@ def main():
                             xSpeed = -1
                     elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                         ySpeed = 0
+                # Go to the next tutorial screen.
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    tutorial.next()
             # Get the mouse coordinates.
             pos = pygame.mouse.get_pos()
             mouse_x = pos[0]
@@ -584,6 +617,9 @@ def main():
             level.draw(screen)
             stars.draw(screen)
             player.draw(screen, level.z)
+
+            # Display the tutorial.
+            tutorial.draw(screen)
 
             # Change state if player won.
             if player.x >= 500:
