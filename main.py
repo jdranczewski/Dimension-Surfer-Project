@@ -383,8 +383,9 @@ class Tutorial():
             self.frame += 1
             # Calculate the frame to render.
             renderFrame = (self.frame//8)%24
-            # Cut the animation sheet accoridng to the renderFrame variable
-            # and render it on screen.
+            # Cut the animation sheet according to the renderFrame variable
+            # and render it on screen. The third argument are the coordinates
+            # and dimensions of the cut
             screen.blit(self.secondImage, [0,150], [0, renderFrame*200, 500, 200])
 
 # Calculate the colour component based on the z position.
@@ -439,10 +440,6 @@ def main():
                     screen.blit(newHighScoreImage, [281, 267])
                     # Change the stored high score to the current score
                     scores[levelIndex-1] = stars.score
-                    # Save the scores to the scores.txt file.
-                    s = open("scores.txt", 'w')
-                    s.write(" ".join([str(x) for x in scores]))
-                    s.close()
                 else:
                     # If the high score has not been beaten, render the
                     # "Current High Score" message.
@@ -457,6 +454,10 @@ def main():
                 # If the next level is not unlocked, unlock it.
                 if scores[levelIndex] < 0:
                     scores[levelIndex] = 0
+                # Save the scores to the scores.txt file.
+                s = open("scores.txt", 'w')
+                s.write(" ".join([str(x) for x in scores]))
+                s.close()
                 # Render the current score using stars
                 # and the algorithm used for that on the main screen.
                 for i in range(3):
