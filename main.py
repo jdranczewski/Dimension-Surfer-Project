@@ -122,6 +122,10 @@ class Player():
         # Add the speeds to the coordinates.
         self.x += self.xSpeed
         self.y += self.ySpeed
+        # Check if the player is not slightly out of the screen on the left side.
+        if self.x < 0:
+            # Displace back onto the screen if yes.
+            self.x = 0
         # Calculate the coordinates of the rectangle's vertices.
         self.vertices = [[self.x, self.y], [self.x + self.width, self.y], [self.x + self.width, self.y + self.height], [self.x, self.y + self.height]]
 
