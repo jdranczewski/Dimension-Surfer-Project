@@ -200,6 +200,9 @@ class Level(ThreeDMesh):
     def collide(self, player):
         # Take the current cross-section from the data array.
         cSection = self.data[math.floor(self.z)]
+        # The final projection vector will be a sum of all the projection
+        # vectors from the collided polygons.
+        finalVector = [0,0]
         # Iterate over the polygons in the current cross-section.
         for obstacle in cSection:
             # Create lists for holding projection vector lengths
@@ -252,11 +255,12 @@ class Level(ThreeDMesh):
             if collided:
                 # Find the index of the shortest vector...
                 minimumIndex = projectionVectorsLenghts.index(min(projectionVectorsLenghts))
-                # ...and pass it to the player.
-                player.collisionDisplace(projectionVectors[minimumIndex])
-                # If there is a collision we do not need to check
-                # the rest of the polygons.
-                break
+                # ...and add it to the final projection vector.
+                finalVector[0] += projectionVectors[minimumIndex][0]
+                finalVector[1] += projectionVectors[minimumIndex][1]
+        # Pass the final projection vector to the player object.
+        # If there were no collisions, it will be [0,0], resulting in no displacement.
+        player.collisionDisplace(finalVector)
 
 # The class that handles all things related to stars
 class Stars():
