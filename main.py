@@ -6,13 +6,20 @@ import sat
 
 
 class ThreeDMesh():
-    def __init__(self, id, baseColour, maxColour):
-        self.id = id
-        self.data = self.importData()
+    def __init__(self, baseColour, maxColour):
         self.z = 0
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = baseColour
+
+    # Set the object to a given level.
+    def set(self, id):
+        # Reset the self.z attribute to start each level at the same z position.
+        self.z = 0
+        # Set the id.
+        self.id = id
+        # Import the data from a text file.
+        self.data = self.importData()
 
     # This method will import polygon data from a text file.
     def importData(self):
@@ -264,16 +271,23 @@ class Level(ThreeDMesh):
 
 # The class that handles all things related to stars
 class Stars():
-    def __init__(self, id, baseColour, maxColour):
+    def __init__(self, baseColour, maxColour):
         # Set the attributes
-        self.id = id
         self.z = 0
-        self.score = 0
-        # Import the data from a text file
-        self.data = self.importData()
         self.baseColour = baseColour
         self.maxColour = maxColour
         self.currentColour = self.baseColour
+
+    # Set the object to a given level.
+    def set(self, id):
+        # Reset the self.z attribute to start each level at the same z position.
+        self.z = 0
+        # Set the id.
+        self.id = id
+        # Reset the score.
+        self.score = 0
+        # Import the data from a text file
+        self.data = self.importData()
 
     # Import the data about the stars
     def importData(self):
@@ -352,6 +366,36 @@ class Stars():
             # ...setting their state to uncllected.
             star[2] = 0
 
+# A class for displaying the tutorial
+class Tutorial():
+    def __init__(self):
+        # Set the state and current frame to zero.
+        self.state = 0
+        self.frame = 0
+        # Load the images
+        self.firstImage = pygame.image.load("images/wsad.png").convert()
+        self.secondImage = pygame.image.load("images/animationsheet.jpg").convert()
+
+    # Change to the next state
+    def next(self):
+        self.state += 1
+
+    # Draw the image corresponding to the state
+    def draw(self, screen):
+        if self.state == 0:
+            # Draw the image explaining the use of the WSAD keys
+            screen.blit(self.firstImage, [0,150])
+        if self.state == 1:
+            # Draw the animation explaining the concept of the third dimension.
+            # Increase the frame counter.
+            self.frame += 1
+            # Calculate the frame to render.
+            renderFrame = (self.frame//8)%24
+            # Cut the animation sheet according to the renderFrame variable
+            # and render it on screen. The third argument are the coordinates
+            # and dimensions of the cut
+            screen.blit(self.secondImage, [0,150], [0, renderFrame*200, 500, 200])
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return math.floor(min + z/500 * (max-min))
@@ -374,85 +418,225 @@ def main():
     clock = pygame.time.Clock()
 
     # Creating objects for testing:
-    level = Level("1_level", (33,150,243), (13,71,161))
-    lava = Lava("1_lava", (255,9,9), (180,0,0))
-    stars = Stars("1_stars", (255,238,88), (253,216,53))
+    level = Level((33,150,243), (13,71,161))
+    lava = Lava((255,9,9), (180,0,0))
+    stars = Stars((255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
-    xSpeed = 0
-    ySpeed = 0
-    leftPressed = 0
-    rightPressed = 0
+    tutorial = Tutorial()
+    s = open("scores.txt", 'r')
+    scores = [int(x) for x in s.read().split(" ")]
+    s.close()
+    # Load the necessary images.
+    backgroundImage = pygame.image.load("images/main_background.png").convert()
+    lockedImage = pygame.image.load("images/locked.png").convert_alpha()
+    youWinImage = pygame.image.load("images/you_win.png").convert_alpha()
+    newHighScoreImage = pygame.image.load("images/new_high_score.png").convert_alpha()
+    prevHighScoreImage = pygame.image.load("images/prev_high_score.png").convert_alpha()
 
+    state = 0
+    firstDraw = 1
     # Main program loop, runs until the close button is pressed.
     while not done:
-        # Event processing - we iterate on the events given to us by pygame:
-        for event in pygame.event.get():
-            # If the event type is QUIT, the user wants to close the window.
-            # So we set done to True.
-            if event.type == pygame.QUIT:
-                done = True
-            # Handle the keydown events.
-            elif event.type == pygame.KEYDOWN:
-                # Go left.
-                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    leftPressed = 1
-                    xSpeed = -1
-                # Go right.
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    rightPressed = 1
-                    xSpeed = 1
-                    # Jump.
-                elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-                    ySpeed = -1
-            # Handle the keyup events.
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    leftPressed = 0
-                    xSpeed = 0
-                    # If right is still pressed, start going right.
-                    if rightPressed == 1:
-                        xSpeed = 1
-                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    rightPressed = 0
-                    xSpeed = 0
-                    # If left is still pressed, start going left.
-                    if leftPressed == 1:
+        if state == -1:
+            # Show the winning screen.
+            if firstDraw:
+                # Render the backgorund.
+                screen.blit(youWinImage, [0, 0])
+                # Check if the current high score has been beaten.
+                if stars.score > scores[levelIndex-1]:
+                    # If yes, then draw the "New High Score" message.
+                    screen.blit(newHighScoreImage, [281, 267])
+                    # Change the stored high score to the current score
+                    scores[levelIndex-1] = stars.score
+                else:
+                    # If the high score has not been beaten, render the
+                    # "Current High Score" message.
+                    screen.blit(prevHighScoreImage, [331, 267])
+                    # Render the current high score using stars
+                    # and the algorithm used for that on the main screen.
+                    for i in range(3):
+                        if i > scores[levelIndex-1] - 1:
+                            stars.drawStar(screen, 350 + i * 33, 330, 1)
+                        else:
+                            stars.drawStar(screen, 350 + i * 33, 330, 0)
+                # If the next level is not unlocked, unlock it.
+                if scores[levelIndex] < 0:
+                    scores[levelIndex] = 0
+                # Save the scores to the scores.txt file.
+                s = open("scores.txt", 'w')
+                s.write(" ".join([str(x) for x in scores]))
+                s.close()
+                # Render the current score using stars
+                # and the algorithm used for that on the main screen.
+                for i in range(3):
+                    if i > stars.score - 1:
+                        stars.drawStar(screen, 54 + i * 33, 330, 1)
+                    else:
+                        stars.drawStar(screen, 54 + i * 33, 330, 0)
+                # Refresh the screen
+                pygame.display.flip()
+                # Indicate that the screen has been drawn already.
+                firstDraw = 0
+            # The event loop must in this case be after the drawing part. If it wasn't
+            # organised this way, setting firstDraw to one in the event loop would
+            # trigger drawing the "You Win" screen instead of the main screen.
+            for event in pygame.event.get():
+                # If the event type is QUIT, the user wants to close the window.
+                # So we set done to True.
+                if event.type == pygame.QUIT:
+                    done = True
+                # If any key is pressed or the mouse is clicked, we go to the main screen.
+                elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+                    firstDraw = 1
+                    state = 0
+
+        elif state == 0:
+            # Show the main screen.
+            # Iterate on the events given by pygame.
+            for event in pygame.event.get():
+                # If the event type is QUIT, the user wants to close the window.
+                # So we set done to True.
+                if event.type == pygame.QUIT:
+                    done = True
+                # If the event type is MOUSEBUTTONDOWN, we assume that the user
+                # may be trying to choose a level.
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    # Get the mouse position.
+                    pos = pygame.mouse.get_pos()
+                    mouse_x = pos[0]
+                    mouse_y = pos[1]
+                    # Check whether the cursor is in the level choice area.
+                    if mouse_x >= 24 and mouse_x <= 475 and mouse_y >= 217 and mouse_y <= 438:
+                        # Calculate the selected level index.
+                        levelIndex = 4*((mouse_y-213)//113) + (mouse_x-24)//113 + 1
+                        # If the level is unlocked, change the state.
+                        if scores[levelIndex-1] >= 0:
+                            # Set the data in the level-related objects.
+                            level.set(str(levelIndex) + "_level")
+                            lava.set(str(levelIndex) + "_lava")
+                            stars.set(str(levelIndex) + "_stars")
+                            # Reset the player's position...
+                            player.reset()
+                            # ...and all the navigation variables.
+                            leftPressed = 0
+                            rightPressed = 0
+                            xSpeed = 0
+                            ySpeed = 0
+                            # Change the state to the given level.
+                            state = levelIndex
+            # Check if drawing needs to be done.
+            if firstDraw:
+                # Draw the background.
+                screen.blit(backgroundImage, [0, 0])
+                # Iterate on the list of scores
+                for i in range(len(scores)):
+                    # If the level is locked display three empty stars
+                    # and a locked badge.
+                    if scores[i] < 0:
+                        for j in range(3):
+                            # We use the drawStar() method od the Stars class.
+                            stars.drawStar(screen, 31 + i%4*113 + j*33, 285 + i//4*113, 1)
+                        screen.blit(lockedImage, [28 + i%4*113, 217 + i//4*113])
+                    # If the level is not locked, display the star score
+                    # using a loop almost identical to that used in the draw()
+                    # method of the Stars class.
+                    else:
+                        for j in range(3):
+                            if j > scores[i] - 1:
+                                stars.drawStar(screen, 31 + i%4*113 + j*33, 285 + i//4*113, 1)
+                            else:
+                                stars.drawStar(screen, 31 + i%4*113 + j*33, 285 + i//4*113, 0)
+                # Refresh the screen
+                pygame.display.flip()
+                # Indicate that there is no need for further drawing.
+                firstDraw = 0
+
+        elif state < 9:
+            # Show the level indicated by the state variable.
+            # Event processing - we iterate on the events given to us by pygame:
+            for event in pygame.event.get():
+                # If the event type is QUIT, the user wants to close the window.
+                # So we set done to True.
+                if event.type == pygame.QUIT:
+                    done = True
+                # Handle the keydown events.
+                elif event.type == pygame.KEYDOWN:
+                    # Go left.
+                    if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        leftPressed = 1
                         xSpeed = -1
-                elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
-                    ySpeed = 0
-        # Get the mouse coordinates.
-        pos = pygame.mouse.get_pos()
-        mouse_x = pos[0]
-        mouse_y = pos[1]
-        # print(mouse_x, mouse_y)
+                    # Go right.
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        rightPressed = 1
+                        xSpeed = 1
+                        # Jump.
+                    elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                        ySpeed = -1
+                    elif event.key == pygame.K_ESCAPE:
+                        # If the user wants to go to the main screen, set firstDraw to one so that
+                        # the main screen is drawn, and then switch state.
+                        firstDraw = 1
+                        state = 0
+                # Handle the keyup events.
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        leftPressed = 0
+                        xSpeed = 0
+                        # If right is still pressed, start going right.
+                        if rightPressed == 1:
+                            xSpeed = 1
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        rightPressed = 0
+                        xSpeed = 0
+                        # If left is still pressed, start going left.
+                        if leftPressed == 1:
+                            xSpeed = -1
+                    elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
+                        ySpeed = 0
+                # Go to the next tutorial screen.
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    tutorial.next()
+            # Get the mouse coordinates.
+            pos = pygame.mouse.get_pos()
+            mouse_x = pos[0]
+            mouse_y = pos[1]
+            # print(mouse_x, mouse_y)
 
-        # Game logic:
-        # Update level and lava based on mouse position
-        level.update(mouse_y)
-        lava.update(mouse_y)
-        # Move the player
-        player.update(xSpeed, ySpeed)
-        # Collide the player with the lava and the level
-        lava.collide(player, stars)
-        level.collide(player)
-        stars.update(mouse_y, player)
+            # Game logic:
+            # Update level and lava based on mouse position
+            level.update(mouse_y)
+            lava.update(mouse_y)
+            # Move the player
+            player.update(xSpeed, ySpeed)
+            # Collide the player with the lava and the level
+            lava.collide(player, stars)
+            level.collide(player)
+            stars.update(mouse_y, player)
 
-        # Do the drawing:
-        # Set the backgorund color
-        backgroundBaseColour = (225,245,254)
-        backgroundMaxColour = (179,229,252)
-        screen.fill((
-            calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
-            calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
-            calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
-        # Draw the lava, the level, stars and the player
-        lava.draw(screen)
-        level.draw(screen)
-        stars.draw(screen)
-        player.draw(screen, level.z)
+            # Do the drawing:
+            # Set the backgorund color
+            backgroundBaseColour = (225,245,254)
+            backgroundMaxColour = (179,229,252)
+            screen.fill((
+                calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
+                calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
+                calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
+            # Draw the lava, the level, stars and the player
+            lava.draw(screen)
+            level.draw(screen)
+            stars.draw(screen)
+            player.draw(screen, level.z)
 
-        # Update the screen:
-        pygame.display.flip()
+            # Display the tutorial.
+            tutorial.draw(screen)
+
+            # Change state if player won.
+            if player.x >= 500:
+                firstDraw = 1
+                state = -1
+
+            # Update the screen:
+            pygame.display.flip()
 
         # Show the frame rate in the title for performance checking.
         pygame.display.set_caption(str(clock.get_fps()))
