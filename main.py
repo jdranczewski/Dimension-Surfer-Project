@@ -25,7 +25,8 @@ class ThreeDMesh():
     def importData(self):
         # Create an empty list for the data.
         data = [[[]]]
-        # Create indexes that will help iterate over polygons and the third dimension.
+        # Create indexes that will help iterate
+        # over polygons and the third dimension.
         polygonIndex = 0
         zIndex = 0
         # Open file specified by the id.
@@ -33,9 +34,9 @@ class ThreeDMesh():
             # Parse every line in the file.
             for line in f:
                 if line == "#\n":
-                    # If line contains a '#' it means that the data about a particular
-                    # cross section has just finished. Create a new sublist
-                    # for the next cross section.
+                    # If line contains a '#' it means that the data about a
+                    # particular cross section has just finished. Create a new
+                    # sublist for the next cross section.
                     data[zIndex].pop()
                     data.append([[]])
                     # We move to the next cross section, so we increase the zIndex.
@@ -92,9 +93,7 @@ class ThreeDMesh():
         # Set the currentColour based on self.z.
         self.currentColour = (calculateColour(self.baseColour[0], self.maxColour[0], self.z), calculateColour(self.baseColour[1], self.maxColour[1], self.z), calculateColour(self.baseColour[2], self.maxColour[2], self.z))
 
-    # Other methods will go here...
-
-# The simplified Player class for testing purposes.
+# The Player class.
 class Player():
     def __init__(self, x, y, width, height, baseColour, maxColour):
         # Set the attributes to the values given.
@@ -266,7 +265,8 @@ class Level(ThreeDMesh):
                 finalVector[0] += projectionVectors[minimumIndex][0]
                 finalVector[1] += projectionVectors[minimumIndex][1]
         # Pass the final projection vector to the player object.
-        # If there were no collisions, it will be [0,0], resulting in no displacement.
+        # If there were no collisions, it will be [0,0],
+        # resulting in no displacement.
         player.collisionDisplace(finalVector)
 
 # The class that handles all things related to stars
@@ -305,17 +305,18 @@ class Stars():
                 data.append(star)
         # Ensure that the file is closed.
         f.closed
-        # Return the data array
+        # Return the data array.
         return data
 
     # Draw a single star.
     def drawStar(self, screen, x, y, state):
-        # The basic star vertices
+        # The basic star vertices.
         vertices = [[32,10],[20,10],[16,0],[12,10],[0,10],[9,19],[6,30],[16,24],[26,30],[23,19],[32,10]]
         # Add the given x and y coordinates to the star's vertices.
         correctedVertices = [[v[0] + x, v[1] + y] for v in vertices]
         # Draw the star. The state is used as width. If it is 0 (uncollected),
-        # the polygon is filled, if it is 1 (collected), a border of width 3 is drawn.
+        # the polygon is filled, if it is 1 (collected),
+        # a border of width 3 is drawn.
         pygame.draw.polygon(screen, self.currentColour, correctedVertices, state*3)
 
     # Draw the stars and the star score.
@@ -335,7 +336,8 @@ class Stars():
 
     # Update the stars.
     def update(self, mouse_y, player):
-        # Use the self.z and colour updating algorithm from the ThreeDMesh class.
+        # Use the self.z and colour updating algorithm
+        # from the ThreeDMesh class.
         diff = mouse_y - self.z
         if abs(diff) > 50:
             diff = 50 * abs(diff) / diff
@@ -363,7 +365,7 @@ class Stars():
         self.score = 0
         # Iterate on the stars...
         for star in self.data:
-            # ...setting their state to uncllected.
+            # ...setting their state to uncollected.
             star[2] = 0
 
 # A class for displaying the tutorial
@@ -411,7 +413,8 @@ def main():
     # Set the title of the window.
     pygame.display.set_caption("My Game")
 
-    # This variable stores whether the user pressed the close button on the window.
+    # This variable stores whether the user pressed
+    # the close button on the window.
     done = False
 
     # An object used to manage how fast the screen updates.
@@ -477,15 +480,17 @@ def main():
                 pygame.display.flip()
                 # Indicate that the screen has been drawn already.
                 firstDraw = 0
-            # The event loop must in this case be after the drawing part. If it wasn't
-            # organised this way, setting firstDraw to one in the event loop would
-            # trigger drawing the "You Win" screen instead of the main screen.
+            # The event loop must in this case be after the drawing part.
+            # If it was not organised this way, setting firstDraw to one
+            # in the event loop would trigger drawing the "You Win" screen
+            # instead of the main screen.
             for event in pygame.event.get():
                 # If the event type is QUIT, the user wants to close the window.
                 # So we set done to True.
                 if event.type == pygame.QUIT:
                     done = True
-                # If any key is pressed or the mouse is clicked, we go to the main screen.
+                # If any key is pressed or the mouse is clicked,
+                # we go to the main screen.
                 elif event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
                     firstDraw = 1
                     state = 0
@@ -573,8 +578,9 @@ def main():
                     elif event.key == pygame.K_w or event.key == pygame.K_SPACE or event.key == pygame.K_UP:
                         ySpeed = -1
                     elif event.key == pygame.K_ESCAPE:
-                        # If the user wants to go to the main screen, set firstDraw to one so that
-                        # the main screen is drawn, and then switch state.
+                        # If the user wants to go to the main screen,
+                        # set firstDraw to one so that the main screen
+                        # is drawn, and then switch state.
                         firstDraw = 1
                         state = 0
                 # Handle the keyup events.
