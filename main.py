@@ -463,7 +463,7 @@ def main():
                         else:
                             stars.drawStar(screen, 350 + i * 33, 330, 0)
                 # If the next level is not unlocked (and in range), unlock it.
-                if scores[levelIndex] < 0 and levelIndex < 8:
+                if levelIndex < 8 and scores[levelIndex] < 0:
                     scores[levelIndex] = 0
                 # Save the scores to the scores.txt file.
                 s = open("scores.txt", 'w')
