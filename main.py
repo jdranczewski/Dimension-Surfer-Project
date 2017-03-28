@@ -443,7 +443,7 @@ def main():
         if state == -1:
             # Show the winning screen.
             if firstDraw:
-                # Render the backgorund.
+                # Render the background.
                 screen.blit(youWinImage, [0, 0])
                 # Check if the current high score has been beaten.
                 if stars.score > scores[levelIndex-1]:
