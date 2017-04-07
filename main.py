@@ -1,6 +1,7 @@
 # Import the pygame library.
 import pygame
 import math
+import random
 # Import the Separating Axis Theorem library
 import sat
 
@@ -398,6 +399,26 @@ class Tutorial():
             # and dimensions of the cut
             screen.blit(self.secondImage, [0,150], [0, renderFrame*200, 500, 200])
 
+# A class for the hopefully good-looking noise
+class Noise():
+    def __init__(self):
+        self.surfaces = [pygame.Surface((500, 500), pygame.SRCALPHA),
+                        pygame.Surface((500, 500), pygame.SRCALPHA),
+                        pygame.Surface((500, 500), pygame.SRCALPHA)]
+
+    def generate(self):
+        print("Generating")
+        i = 0
+        for surface in self.surfaces:
+            i += 6
+            for x in range(0,501,i):
+                for y in range(0,501,i):
+                    pygame.draw.rect(surface, (0,0,0,20*random.randrange(3)), [x,y,i,i])
+            surface = surface.convert()
+
+    def draw(self, screen, i):
+        screen.blit(self.surfaces[i], [0,0])
+
 # Calculate the colour component based on the z position.
 def calculateColour(min, max, z):
     return math.floor(min + z/500 * (max-min))
@@ -426,6 +447,7 @@ def main():
     stars = Stars((255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
     tutorial = Tutorial()
+    noise = Noise()
     s = open("scores.txt", 'r')
     scores = [int(x) for x in s.read().split(" ")]
     s.close()
@@ -520,6 +542,7 @@ def main():
                             level.set(str(levelIndex) + "_level")
                             lava.set(str(levelIndex) + "_lava")
                             stars.set(str(levelIndex) + "_stars")
+                            noise.generate()
                             # Reset the player's position...
                             player.reset()
                             # ...and all the navigation variables.
@@ -628,9 +651,12 @@ def main():
                 calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
                 calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
             # Draw the lava, the level, stars and the player
+            noise.draw(screen, 0)
             lava.draw(screen)
+            noise.draw(screen, 1)
             level.draw(screen)
             stars.draw(screen)
+            noise.draw(screen, 2)
             player.draw(screen, level.z)
 
             # Display the tutorial.
