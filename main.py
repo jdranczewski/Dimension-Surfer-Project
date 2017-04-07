@@ -402,9 +402,11 @@ class Tutorial():
 # A class for the hopefully good-looking noise
 class Noise():
     def __init__(self):
-        self.surfaces = [pygame.Surface((500, 500), pygame.SRCALPHA),
-                        pygame.Surface((500, 500), pygame.SRCALPHA),
-                        pygame.Surface((500, 500), pygame.SRCALPHA)]
+        self.surfaces = [pygame.Surface((500, 500)),
+                        pygame.Surface((500, 500)),
+                        pygame.Surface((500, 500))]
+        for surface in self.surfaces:
+            surface.set_alpha(20)
 
     def generate(self):
         print("Generating")
@@ -413,7 +415,8 @@ class Noise():
             i += 6
             for x in range(0,501,i):
                 for y in range(0,501,i):
-                    pygame.draw.rect(surface, (0,0,0,20*random.randrange(3)), [x,y,i,i])
+                    percentage = 20*random.randrange(3)
+                    pygame.draw.rect(surface, (percentage, percentage, percentage), [x,y,i,i])
             surface = surface.convert()
 
     def draw(self, screen, i):
