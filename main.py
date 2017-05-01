@@ -440,6 +440,8 @@ def main():
     # Creating objects for testing:
     level = Level((33,150,243), (13,71,161))
     lava = Lava((255,9,9), (180,0,0))
+    background = ThreeDMesh((225,255,255), (189,239,255))
+    background.set("background")
     stars = Stars((255,238,88), (253,216,53))
     player = Player(0, 0, 20, 20, (255,193,0), (255,111,0))
     tutorial = Tutorial()
@@ -629,6 +631,7 @@ def main():
             # Update level and lava based on mouse position
             level.update(mouse_y)
             lava.update(mouse_y)
+            background.update(mouse_y)
             # Move the player
             player.update(xSpeed, ySpeed)
             # Collide the player with the lava and the level
@@ -644,6 +647,7 @@ def main():
                 calculateColour(backgroundBaseColour[0], backgroundMaxColour[0], level.z),
                 calculateColour(backgroundBaseColour[1], backgroundMaxColour[1], level.z),
                 calculateColour(backgroundBaseColour[2], backgroundMaxColour[2], level.z)))
+            background.draw(screen)
             # Draw the lava, the level, stars and the player
             lava.draw(screen)
             level.draw(screen)
