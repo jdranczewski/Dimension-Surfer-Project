@@ -428,7 +428,7 @@ def main():
     screen = pygame.display.set_mode(size)
 
     # Set the title of the window.
-    pygame.display.set_caption("My Game")
+    pygame.display.set_caption("Dimension Surfer")
 
     # This variable stores whether the user pressed
     # the close button on the window.
@@ -666,7 +666,7 @@ def main():
             pygame.display.flip()
 
         # Show the frame rate in the title for performance checking.
-        pygame.display.set_caption(str(clock.get_fps()))
+        # pygame.display.set_caption(str(clock.get_fps()))
         # Set the desired frame rate to 60fps (frames per second.
         clock.tick(60)
 
