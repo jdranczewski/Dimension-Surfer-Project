@@ -110,6 +110,12 @@ class Player():
         self.yPV = 0
         # Create the vertices list
         self.vertices = []
+        self.faces = [pygame.image.load("images/left.png").convert_alpha(),
+                      pygame.image.load("images/stationary.png").convert_alpha(),
+                      pygame.image.load("images/right.png").convert_alpha(),
+                      pygame.image.load("images/jump.png").convert_alpha(),
+                      pygame.image.load("images/fall.png").convert_alpha()]
+        self.faceState = 1
 
     # Update the position every refresh based on keyboard input.
     def update(self, xSpeed, ySpeed):
@@ -143,6 +149,17 @@ class Player():
                   calculateColour(self.baseColour[2], self.maxColour[2], levelZ))
         # Use pygame's built in draw rectangle function.
         pygame.draw.rect(screen, colour, [self.x, self.y, self.width, self.height])
+        if self.ySpeed < 0:
+            self.faceState = 3
+        elif self.ySpeed > 2:
+            self.faceState = 4
+        elif self.xSpeed < 0:
+            self.faceState = 0
+        elif self.xSpeed > 0:
+            self.faceState = 2
+        else:
+            self.faceState = 1
+        screen.blit(self.faces[self.faceState], [self.x-5, self.y-5])
 
     # Displace the player after collision.
     def collisionDisplace(self, projectionVector):
