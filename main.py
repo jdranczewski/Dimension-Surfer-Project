@@ -129,7 +129,6 @@ class Player():
             self.ySpeed = 5
         # Jump if conditions are met.
         if ySpeed == -1 and self.yPV < 0 and abs(self.yPV) / math.sqrt(self.xPV ** 2 + self.yPV ** 2) > 0.1 :
-            print (self.xPV, self.yPV, abs(self.yPV) / math.sqrt(self.xPV ** 2 + self.yPV ** 2))
             self.ySpeed = -5
         # Reset the stored x and y components of the projection vector.
         self.xPV = 0
@@ -173,7 +172,7 @@ class Player():
         self.yPV = projectionVector[1]
         self.xPV = projectionVector[0]
         # Reset the ySpeed after collision
-        if projectionVector[1] < 0:
+        if projectionVector[1] != 0:
             self.ySpeed *= abs(projectionVector[0]) / math.sqrt(projectionVector[0] ** 2 + projectionVector[1] ** 2)
 
     # Reset the Player's position.
