@@ -127,7 +127,7 @@ class Player():
         if self.ySpeed > 5:
             self.ySpeed = 5
         # Jump if conditions are met.
-        if ySpeed == -1 and self.yPV < -0.1:
+        if ySpeed == -1 and self.yPV < -0.05:
             self.ySpeed = -5
         # Reset the stored y component of the projection vector.
         self.yPV = 0
