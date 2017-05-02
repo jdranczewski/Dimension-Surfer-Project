@@ -70,7 +70,7 @@ class ThreeDMesh():
     def draw(self, screen):
         # This is a set of polygons in the cross-section that
         # we will be drawing:
-        drawing = self.data[math.floor(self.z)]
+        drawing = self.data[int(math.floor(self.z))]
         # We iterate on the elements of the drawing list,
         # which are lists of vertices...
         for polygon in drawing:
@@ -185,7 +185,7 @@ class Lava(ThreeDMesh):
     # A method for detecting collisions.
     def collide(self, player, stars):
         # Take the current cross-section from the data array.
-        cSection = self.data[math.floor(self.z)]
+        cSection = self.data[int(math.floor(self.z))]
         # Iterate over the polygons in the current cross-section.
         for obstacle in cSection:
             # Check the x and y axes.
@@ -222,7 +222,7 @@ class Level(ThreeDMesh):
     # A method for detecting collisions.
     def collide(self, player):
         # Take the current cross-section from the data array.
-        cSection = self.data[math.floor(self.z)]
+        cSection = self.data[int(math.floor(self.z))]
         # The final projection vector will be a sum of all the projection
         # vectors from the collided polygons.
         finalVector = [0,0]
