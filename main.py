@@ -455,6 +455,7 @@ def main():
     backgroundImage = pygame.image.load("images/main_background.png").convert()
     lockedImage = pygame.image.load("images/locked.png").convert_alpha()
     youWinImage = pygame.image.load("images/you_win.png").convert_alpha()
+    loadingImage = pygame.image.load("images/loading.png").convert_alpha()
     newHighScoreImage = pygame.image.load("images/new_high_score.png").convert_alpha()
     prevHighScoreImage = pygame.image.load("images/prev_high_score.png").convert_alpha()
 
@@ -538,6 +539,8 @@ def main():
                         levelIndex = 4*((mouse_y-213)//113) + (mouse_x-24)//113 + 1
                         # If the level is unlocked, change the state.
                         if scores[levelIndex-1] >= 0:
+                            screen.blit(loadingImage, [0,0])
+                            pygame.display.flip()
                             # Set the data in the level-related objects.
                             level.set(str(levelIndex) + "_level")
                             lava.set(str(levelIndex) + "_lava")
