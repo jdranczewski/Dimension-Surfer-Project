@@ -107,6 +107,7 @@ class Player():
         self.height = height
         self.baseColour = baseColour
         self.maxColour = maxColour
+        self.xPV = 0
         self.yPV = 0
         # Create the vertices list
         self.vertices = []
@@ -127,9 +128,11 @@ class Player():
         if self.ySpeed > 5:
             self.ySpeed = 5
         # Jump if conditions are met.
-        if ySpeed == -1 and self.yPV < -0.05:
+        if ySpeed == -1 and self.yPV < 0 and abs(self.yPV) / math.sqrt(self.xPV ** 2 + self.yPV ** 2) > 0.1 :
+            print (self.xPV, self.yPV, abs(self.yPV) / math.sqrt(self.xPV ** 2 + self.yPV ** 2))
             self.ySpeed = -5
-        # Reset the stored y component of the projection vector.
+        # Reset the stored x and y components of the projection vector.
+        self.xPV = 0
         self.yPV = 0
         # Add the speeds to the coordinates.
         self.x += self.xSpeed
@@ -166,8 +169,9 @@ class Player():
         # Change the player's x and y coordinates according to the projection vector.
         self.x += projectionVector[0]
         self.y += projectionVector[1]
-        # Save the y component of the projection vector for use in update()
+        # Save the x and y component of the projection vector for use in update()
         self.yPV = projectionVector[1]
+        self.xPV = projectionVector[0]
         # Reset the ySpeed after collision
         if projectionVector[1] < 0:
             self.ySpeed *= abs(projectionVector[0]) / math.sqrt(projectionVector[0] ** 2 + projectionVector[1] ** 2)
